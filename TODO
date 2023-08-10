@@ -14,4 +14,4 @@
 - Add HMS state logic for Bambu Printers
 - Figure out how to turn off USB when the system is shutting down, but not powering off
 - Figure out if MQTT is better for klipper/moonraker than the http calls
-
+- Add a notify option to send status messages to a webhook url (like discord).  Klipper and Octoprint do this already (and probably better than I could), but nothing for Bambu
