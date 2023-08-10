@@ -5,41 +5,6 @@ Requires the following python3 modules:
 
 printers.led is the configuration file
 
-Example stanzas are:
-[bambulab_x1c]
-ip = 1.1.1.1
-#assumes port 8883
-accesscode = 1a2b3c4d
-serialnumber = 000MPAL000MPA
-usbled = usb-SerialPath-ByID1
+Example stanzas are in printers.led.syntax
 
-[bambulab_p1p]
-ip = 1.1.1.2
-#assumes port 8883
-accesscode = 1a2b3c4e
-serialnumber = 000WILLYWONKA
-usbled = usb-SerialPath-ByID2
-
-[klipper_host]
-ip = 1.1.1.3
-#assumes port 7125
-usbled = usb-SerialPath-ByID3
-
-[octoprint]
-ip = 1.1.1.4:80
-#Provide the HTTP Port for octoprint, 80, 5001 are common
-apikey = APPLICATION_APIKEY_FROM_WEBGUI
-usbled = usb-SerialPath-ByID4
-
-[slot5]
-ip = none
-usbled = usb-SerialPath-ByID5
-
-[slot6]
-ip = none
-usbled = usb-SerialPath-ByID6
-
-[slot7]
-ip = none
-usbled = usb-SerialPath-ByID7
-
+Originally written to support the fit-statUSB since I had a number of them available.   They appear to have been End of Life'd.

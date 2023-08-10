@@ -1,0 +1,16 @@
+
+- Support Adafruit Neo Trinkey
+-- Add LED Type to Configuration
+-- Add Logic to setcolor based on LED Type
+-- Figure out firmware to use to accept serial commands and set color / flashrate
+- Add Printer Type to Configuration
+- Combine the individual scripts to one monolithic script
+- Get screen to run on startup
+- Improve Error Handling
+- Learn how to do actual programming instead of this hacky crap
+- Change usbled configuration item to be full path, should be able to support /dev/serial/by-id or /dev/serial/by-path 
+- Add information to README about LED status indicators
+- Add HMS state logic for Bambu Printers
+- Figure out how to turn off USB when the system is shutting down, but not powering off
+- Figure out if MQTT is better for klipper/moonraker than the http calls
+
