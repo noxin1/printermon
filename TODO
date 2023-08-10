@@ -4,6 +4,7 @@
 -- Add Logic to setcolor based on LED Type
 -- Figure out firmware to use to accept serial commands and set color / flashrate
 - Add Printer Type to Configuration
+- Figure out how to determine how long the printer has been idle for and turn off the LED at a supplied time.   Maybe set this in the config file
 - Combine the individual scripts to one monolithic script
 - Get screen to run on startup
 - Improve Error Handling
