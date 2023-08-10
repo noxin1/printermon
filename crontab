@@ -1,0 +1,1 @@
+@reboot /usr/bin/screen -c /root/screen-printermonitor -d -m

@@ -1,0 +1,8 @@
+startup_message off
+screen /usr/bin/python3 /root/bl.py xero
+screen /usr/bin/python3 /root/bl.py percy
+screen /usr/bin/python3 /root/klipper.py k1
+screen /usr/bin/python3 /root/klipper.py ender5pro
+screen /usr/bin/python3 /root/octoprint.py elf1
+screen /usr/bin/python3 /root/empty.py slot6
+screen /usr/bin/python3 /root/empty.py slot7
