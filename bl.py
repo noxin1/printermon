@@ -1,4 +1,3 @@
-
 # python3.6
 
 import random
@@ -12,6 +11,7 @@ import re
 import string
 import signal
 import configparser
+import requests
 from os.path import exists
 from paho.mqtt import client as mqtt_client
 
@@ -50,7 +50,7 @@ def connect_mqtt() -> mqtt_client:
     client.connect(broker, port)
     return client
 
-def setcolor(color):
+def setcolor(color,message):
     global curcolor
     global usbled
     #print(color)
@@ -64,30 +64,34 @@ def setcolor(color):
       elif color == "purple":
         HEXCODE=b"B#050005\n"
       elif color == "green":
-        HEXCODE=b"B#000500\n"
+        HEXCODE=b"B#002500\n"
       elif color == "red":
         HEXCODE=b"B#050000\n"
       elif color == "blue":
         HEXCODE=b"B#000005\n"
       elif color == "black":
         HEXCODE=b"B#000000\n"
+      elif color == "lowgreen":
+        HEXCODE=b"B#000200-1000\n"
       elif color == "slowgreen":
-        HEXCODE=b"B#000500-1000#000000-6000\n"
+        HEXCODE=b"B#001500-1000#000500-6000\n"
       elif color == "slowyellow":
         HEXCODE=b"B#414410-1000#000000-6000\n"
       elif color == "fastred":
         HEXCODE=b"B#300000-0500#000000-1000\n"
-      cmd = f"ls /dev/serial/by-id/{usbled}"
-      OUTP = subprocess.getoutput(cmd)
+      ###cmd = f"ls /dev/serial/by-id/{usbled}"
+      ###OUTP = subprocess.getoutput(cmd)
+      OUTP = usbled
     #print(OUTP)
       ser = serial.Serial(OUTP)
       ser.write(HEXCODE)
       ser.close()
+      discord(f'{printer} {color} {message}')
     #else:
     #  print("Nothing to do here")
 
     curcolor=color
-    
+
 def publish(client):
     global serialnumber
     topicpublish = f"device/{serialnumber}/request"
@@ -112,20 +116,85 @@ def subscribe(client: mqtt_client):
            #print(msg.payload.decode())
            blah = "blah"
         else:
-           if stage == 6 or stage == 17 or stage == 20 or stage == 21:
-              setcolor("red")
-           elif stage == 5 or stage == 16:
-               setcolor("yellow")
+           #print(stage)
+           if stage == 0:
+              setcolor("slowgreen", 'Printing')
+           elif stage == 1:
+               setcolor("slowgreen", 'auto_bed_leveling')
+           elif stage == 2:
+               setcolor("slowgreen", 'heatbed_preheating')
+           elif stage == 3:
+               setcolor("slowgreen", 'sweeping_xy_mech_mode')
            elif stage == 4:
-               setcolor("slowyellow")
-           elif stage == -1:
-              setcolor("slowgreen")
+               setcolor("slowgreen", 'changing filament')
+           elif stage == 5:
+               setcolor("slowgreen", 'm400_pause')
+           elif stage == 6:
+               setcolor("yellow",'paused_filament_runout')
+           elif stage == 7:
+               setcolor("slowgreen",'heating_hotend')
+           elif stage == 8:
+               setcolor("slowgreen",'calibrating_extrusion')
+           elif stage == 9:
+               setcolor("slowgreen",'scanning_bed_surface')
+           elif stage == 10:
+               setcolor("slowgreen",'inspecting_first_layer')
+           elif stage == 11:
+               setcolor("slowgreen",'identifying_build_plate_type')
+           elif stage == 12:
+               setcolor("slowgreen",'calibrating_micro_lidar')
+           elif stage == 13:
+               setcolor("slowgreen",'homing_toolhead')
            elif stage == 14:
-              setcolor("black")
+               setcolor("slowgreen",'cleaning_nozzle_tip')
+           elif stage == 15:
+               setcolor("slowgreen",'checking_extruder_temperature')
+           elif stage == 16:
+               setcolor("yellow",'paused_user')
+           elif stage == 17:
+               setcolor("red",'paused_front_cover_falling')
+           elif stage == 18:
+               setcolor("slowgreen",'calibration_micro_lidar')
+           elif stage == 19:
+               setcolor("slowgreen",'calibration_extrusion_flow')
+           elif stage == 20:
+               setcolor("red",'paused_nozzle_temperature_malfunction')
+           elif stage == 21:
+               setcolor("red",'paused_heat_bed_temperature_malfunction')
+           elif stage == 22:
+               setcolor("slowyellow",'filament_unloading')
+           elif stage == 23:
+               setcolor("red",'paused_skipped_step')
+           elif stage == 24:
+               setcolor("slowyellow",'filament_loading')
+           elif stage == 25:
+               setcolor("slowgreen",'calibrating_motor_noise')
+           elif stage == 26:
+               setcolor("red",'paused_ams_lost')
+           elif stage == 27:
+               setcolor("red",'paused_low_fan_speed_heat_break')
+           elif stage == 28:
+               setcolor("red",'paused_champer_temperature_control_error')
+           elif stage == 29:
+               setcolor("slowgreen",'cooling_chamber')
+           elif stage == 30:
+               setcolor("slowyellow",'paused_user_gcode')
+           elif stage == 31:
+               setcolor("slowgreen",'motor_noise_showoff')
+           elif stage == 32:
+               setcolor("red",'paused_nozzle_filament_covered_detected')
+           elif stage == 33:
+               setcolor("red",'paused_cutter_error')
+           elif stage == 34:
+               setcolor("red",'paused_first_layer_error')
+           elif stage == 35:
+               setcolor("red",'paused_nozzle_clog')
            elif stage == 255:
-               setcolor("slowgreen")
+               setcolor("green",'idle/done')
+           elif stage == -1:
+               setcolor("green",'idle/done')
            else:
-              setcolor("green")
+               setcolor("Red",'unknown code')
 
 
     topic = f"device/{serialnumber}/report"
@@ -133,12 +202,23 @@ def subscribe(client: mqtt_client):
     if curcolor == "white":
         timeout= time.strftime("%Y-%m-%D %H:%M:%S")
         print(f"{timeout} {printer} Unknown Status, sending a message to the request topic")
-        setcolor("red")
+        setcolor("red", "Error connecting to printer")
         publish(client)
     client.on_message = on_message
 
 def sigterm_handler(_signo, _stack_frame):
     sys.exit(0)
+
+def discord(MESSAGE):
+    WHURL="WEBHOOKURL"
+    data = { "content" : MESSAGE, "username" : "Printmon" }
+    result = requests.post(WHURL, json = data)
+    try:
+        result.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+#    else:
+#        print(f"Payload delivered successfully, code {result.status_code}.")
 
 def run():
     global printer
@@ -149,20 +229,19 @@ def run():
         print("Please Enter a printer to monitor")
         exit(1)
     loadconfig()
-    setcolor("white")
+    setcolor("white", "Script Starting")
     time.sleep(2)
     client = connect_mqtt()
     subscribe(client)
     try:
         client.loop_forever()
     except KeyboardInterrupt:
-        setcolor("black")
+        setcolor("black", "Script Shutting Down")
         exit()
     except Exception as e:
         blah = "blah"
     finally:
-        setcolor("black")
+        setcolor("black", "Script shutting Down")
 
 if __name__ == '__main__':
     run()
-
